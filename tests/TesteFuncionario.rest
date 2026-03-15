@@ -1,0 +1,34 @@
+# Gilberto Mota de Oliveira Junior
+### Verbo GET – listar todos 
+GET http://localhost:8000/funcionario/ HTTP/1.1 
+
+### Verbo GET – listar um 
+GET http://localhost:8000/funcionario/10 HTTP/1.1 
+### Verbo POST – adicionar 
+POST http://127.0.0.1:8000/funcionario/ HTTP/1.1 
+content-type: application/json
+
+{
+    "nome" : "Gilberto Mota de Oliveira Junior", 
+    "matricula" : "12345", 
+    "cpf" : "01923874656", 
+    "telefone" : "49988234567", 
+    "grupo" : 1, 
+    "senha" : "bolinhas"
+} 
+
+### Verbo PUT – atualiza 
+PUT http://127.0.0.1:8000/funcionario/2 HTTP/1.1 
+content-Type: application/json
+
+{ 
+    "nome" : "Abc da Silva EDIT", 
+    "matricula" : "12345", 
+    "cpf" : "01923874656", 
+    "telefone" : "49988234567", 
+    "grupo" : 1, 
+    "senha" : "bolinhas" 
+} 
+
+### Verbo DELETE - excluir 
+DELETE http://127.0.0.1:8000/funcionario/3 HTTP/1.1
