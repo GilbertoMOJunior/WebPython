@@ -1,3 +1,4 @@
+# Gilberto Mota de Oliveira Junior
 from infra import database
 from sqlalchemy import Column, VARCHAR, CHAR, Integer
 

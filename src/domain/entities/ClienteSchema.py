@@ -1,4 +1,4 @@
-# Gilberto mota de Oliveira Junior
+# Gilberto Mota de Oliveira Junior
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
