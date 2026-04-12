@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 # Domain Schemas
-from domain.entities.ProdutoSchema import (
+from domain.schemas.ProdutoSchema import (
     ProdutoCreate,
     ProdutoUpdate,
     ProdutoResponse,

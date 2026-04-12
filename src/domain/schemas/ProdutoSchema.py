@@ -9,10 +9,10 @@ class ProdutoCreate(BaseModel):
     valor_unitario: float
 
 class ProdutoUpdate(BaseModel):
-    nome: str 
-    descricao: str 
+    nome: Optional[str] = None
+    descricao: Optional[str] = None
     foto: Optional[bytes] = None
-    valor_unitario: float 
+    valor_unitario: Optional[float] = None
 
 class ProdutoResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

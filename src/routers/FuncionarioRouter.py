@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 # Domain Schemas
-from domain.entities.FuncionarioSchema import (
+from domain.schemas.FuncionarioSchema import (
     FuncionarioCreate,
     FuncionarioUpdate,
     FuncionarioResponse
@@ -20,7 +20,7 @@ from infra.dependencies import get_current_active_user, require_group
 router = APIRouter()
 
 @router.get("/funcionario/", response_model=List[FuncionarioResponse], tags=["Funcionário"], status_code=status.HTTP_200_OK)
-async def get_funcionario(
+async def get_funcionarios(
     db: Session = Depends(get_db),
     current_user: FuncionarioAuth = Depends(require_group([1]))
     ):

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 # Domain Schemas
-from domain.entities.ClienteSchema import (
+from domain.schemas.ClienteSchema import (
     ClienteCreate,
     ClienteUpdate,
     ClienteResponse
