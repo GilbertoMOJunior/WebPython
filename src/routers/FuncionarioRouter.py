@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 # Domain Schemas
-from domain.entities.FuncionarioSchema import (
+from domain.schemas.FuncionarioSchema import (
     FuncionarioCreate,
     FuncionarioUpdate,
     FuncionarioResponse

@@ -13,21 +13,20 @@ from routers import ProdutoRouter
 from routers import AuditoriaRouter
 from routers import HealthRouter
 
+# importa os modelos ORM para que as tabelas sejam criadas no startup
+from infra.orm import FuncionarioModel, ClienteModel, ProdutoModel, AuditoriaModel
+
 # lifespan - ciclo de vida da aplicação
 from infra import database
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # executa no startup
     print("API has started")
-    # cria, caso não existam, as tabelas de todos os modelos que encontrar na aplicação (importados)
     await database.cria_tabelas()
     yield
-    # executa no shutdown
     print("API is shutting down")
 
-# cria a aplicação FastAPI com o contexto de vida
 app = FastAPI(lifespan=lifespan)
 
 # Configuração de Rate Limiting
