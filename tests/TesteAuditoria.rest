@@ -1,0 +1,44 @@
+### Gilberto Mota de Oliveira Junior
+
+### Token gerado após login
+@access_token = seuTokenAqui
+
+### Listar ações e recursos já utilizados e disponíveis para filtro
+GET http://localhost:8000/auditoria/acoes
+Authorization: Bearer {{access_token}}
+
+### Listar auditoria geral (todas as ações)
+GET http://localhost:8000/auditoria
+Authorization: Bearer {{access_token}}
+
+### Filtrar por ação CREATE (cadastro de funcionário)
+GET http://localhost:8000/auditoria?acao=CREATE&recurso=FUNCIONARIO
+Authorization: Bearer {{access_token}}
+
+### Filtrar por ação UPDATE (edição de cliente)
+GET http://localhost:8000/auditoria?acao=UPDATE&recurso=CLIENTE
+Authorization: Bearer {{access_token}}
+
+### Filtrar por ação DELETE (exclusão de produto)
+GET http://localhost:8000/auditoria?acao=DELETE&recurso=PRODUTO
+Authorization: Bearer {{access_token}}
+
+### Filtrar por ação LOGIN (autenticação de funcionário)
+GET http://localhost:8000/auditoria?acao=LOGIN&recurso=AUTH
+Authorization: Bearer {{access_token}}
+
+### Filtrar por múltiplas ações e recursos com paginação
+GET http://localhost:8000/auditoria?acao=LOGIN,CREATE&recurso=AUTH,FUNCIONARIO&skip=0&limite=50
+Authorization: Bearer {{access_token}}
+
+### Filtrar por data
+GET http://localhost:8000/auditoria?data_inicio=2026-01-01&data_fim=2026-12-31
+Authorization: Bearer {{access_token}}
+
+### Filtrar por funcionário específico
+GET http://localhost:8000/auditoria?funcionario_id=1
+Authorization: Bearer {{access_token}}
+
+### Segunda página de resultados
+GET http://localhost:8000/auditoria?skip=50&limite=50
+Authorization: Bearer {{access_token}}

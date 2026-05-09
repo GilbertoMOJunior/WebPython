@@ -1,0 +1,22 @@
+### Gilberto Mota de Oliveira Junior
+
+### Health check básico - verificação de saúde da API
+GET http://localhost:8000/health
+
+### Health check do banco de dados - verifica conexão
+GET http://localhost:8000/health/database
+
+### Health check das tabelas - verifica se tabelas críticas existem e têm dados
+GET http://localhost:8000/health/database/tables
+
+### Health check do sistema - verifica recursos (memória, disco, CPU)
+GET http://localhost:8000/health/system
+
+### Health check completo - todos os componentes
+GET http://localhost:8000/health/full
+
+### Readiness probe - verifica se API está pronta para receber tráfego
+GET http://localhost:8000/ready
+
+### Liveness probe - verifica se API está viva
+GET http://localhost:8000/live

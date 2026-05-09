@@ -19,8 +19,12 @@ from infra.security import (
     verify_refresh_token
 )
 from infra.dependencies import get_current_active_user
+from infra.rate_limit import limiter, get_rate_limit
+from slowapi.errors import RateLimitExceeded
 
 from settings import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
+
+from services.AuditoriaService import AuditoriaService
 
 router = APIRouter()
 
@@ -31,16 +35,20 @@ router = APIRouter()
     tags=["Autenticação"],
     summary="Login de funcionário - pública - retorna access e refresh token"
 )
-async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit(get_rate_limit("critical"))
+async def login(
+    request: Request,
+    login_data: LoginRequest,
+    db: Session = Depends(get_db)
+):
     """
     Realiza login do funcionário e retorna access token e refresh token
     """
     try:
-        # Busca funcionário pelo CPF
         funcionario = db.query(FuncionarioDB).filter(
             FuncionarioDB.cpf == login_data.cpf
         ).first()
-        
+
         if not funcionario:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,7 +56,6 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        # Verifica senha
         if not verify_password(login_data.senha, funcionario.senha):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -56,7 +63,6 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        # Access token
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={
@@ -67,13 +73,20 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
             expires_delta=access_token_expires
         )
 
-        # Refresh token
         refresh_token = create_refresh_token(
             data={
                 "sub": funcionario.cpf,
                 "id": funcionario.id,
                 "grupo": funcionario.grupo
             }
+        )
+
+        AuditoriaService.registrar_acao(
+            db=db,
+            funcionario_id=funcionario.id,
+            acao="LOGIN",
+            recurso="AUTH",
+            request=request
         )
 
         return TokenResponse(
@@ -84,6 +97,8 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
             refresh_expires_in=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
         )
 
+    except RateLimitExceeded:
+        raise
     except HTTPException:
         raise
     except Exception as e:
@@ -99,17 +114,20 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     tags=["Autenticação"],
     summary="Refresh token - pública - renova access token"
 )
-async def refresh_token(refresh_data: RefreshTokenRequest, db: Session = Depends(get_db)):
+@limiter.limit(get_rate_limit("critical"))
+async def refresh_token(
+    request: Request,
+    refresh_data: RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
     """
     Renova o access token usando um refresh token válido
     """
     try:
-        # Decodifica refresh token
         payload = verify_refresh_token(refresh_data.refresh_token)
 
         cpf = payload.get("sub")
 
-        # Busca funcionário
         funcionario = db.query(FuncionarioDB).filter(
             FuncionarioDB.cpf == cpf
         ).first()
@@ -121,7 +139,6 @@ async def refresh_token(refresh_data: RefreshTokenRequest, db: Session = Depends
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        # Novo access token
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={
@@ -132,13 +149,20 @@ async def refresh_token(refresh_data: RefreshTokenRequest, db: Session = Depends
             expires_delta=access_token_expires
         )
 
-        # Novo refresh token
         new_refresh_token = create_refresh_token(
             data={
                 "sub": funcionario.cpf,
                 "id": funcionario.id,
                 "grupo": funcionario.grupo
             }
+        )
+
+        AuditoriaService.registrar_acao(
+            db=db,
+            funcionario_id=funcionario.id,
+            acao="REFRESH",
+            recurso="AUTH",
+            request=request
         )
 
         return TokenResponse(
@@ -149,6 +173,8 @@ async def refresh_token(refresh_data: RefreshTokenRequest, db: Session = Depends
             refresh_expires_in=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
         )
 
+    except RateLimitExceeded:
+        raise
     except HTTPException:
         raise
     except Exception as e:
@@ -176,5 +202,6 @@ async def get_current_user_info(
     tags=["Autenticação"],
     summary="Logout - pública"
 )
-async def logout():
+@limiter.limit(get_rate_limit("critical"))
+async def logout(request: Request):
     return {"message": "Logout realizado com sucesso"}
