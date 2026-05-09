@@ -1,5 +1,6 @@
 # Gilberto Mota de Oliveira Junior
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from settings import HOST, PORT, RELOAD
 from infra.rate_limit import limiter, rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -10,11 +11,12 @@ from routers import AuthRouter
 from routers import FuncionarioRouter
 from routers import ClienteRouter
 from routers import ProdutoRouter
+from routers import ComandaRouter
 from routers import AuditoriaRouter
 from routers import HealthRouter
 
 # importa os modelos ORM para que as tabelas sejam criadas no startup
-from infra.orm import FuncionarioModel, ClienteModel, ProdutoModel, AuditoriaModel
+from infra.orm import FuncionarioModel, ClienteModel, ProdutoModel, ComandaModel, AuditoriaModel
 
 # lifespan - ciclo de vida da aplicação
 from infra import database
@@ -28,6 +30,18 @@ async def lifespan(app: FastAPI):
     print("API is shutting down")
 
 app = FastAPI(lifespan=lifespan)
+
+# CORS - libera o frontend Vite (localhost:5173) a consumir a API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Configuração de Rate Limiting
 app.state.limiter = limiter
@@ -49,6 +63,7 @@ app.include_router(AuthRouter.router)
 app.include_router(FuncionarioRouter.router)
 app.include_router(ClienteRouter.router)
 app.include_router(ProdutoRouter.router)
+app.include_router(ComandaRouter.router)
 app.include_router(AuditoriaRouter.router)
 app.include_router(HealthRouter.router)
 
